@@ -8,16 +8,16 @@ export class UserAuthController {
   constructor(private readonly userAuthService: UserAuthService) {}
 
   @Post('register')
-  async registerUser(@Body() body: { username: string; password: string }): Promise<{ message: string }> {
-    const { username, password } = body;
-    await this.userAuthService.registerUser(username, password);
+  async registerUser(@Body() body: { email: string; password: string }): Promise<{ message: string }> {
+    const { email, password } = body;
+    await this.userAuthService.registerUser(email, password);
     return { message: 'User registered successfully' };
   }
 
   @Post('login')
-  async loginUser(@Body() body: { username: string; password: string }): Promise<{ message: string; token: string }> {
-    const { username, password } = body;
-    const token = await this.userAuthService.loginUser(username, password);
+  async loginUser(@Body() body: { email: string; password: string }): Promise<{ message: string; token: string }> {
+    const { email, password } = body;
+    const token = await this.userAuthService.loginUser(email, password);
     return { message: 'Login successful', token };
   }
 

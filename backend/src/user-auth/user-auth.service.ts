@@ -11,30 +11,29 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
-@Injectable()
 export class UserAuthService {
   private readonly logger = new Logger(UserAuthService.name);
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async registerUser(
-    username: string,
+    email: string,
     password: string,
   ): Promise<{ message: string }> {
     try {
       const hash = await bcrypt.hash(password, 10);
-      await this.userModel.create({ username, password: hash });
+      await this.userModel.create({ email, password: hash });
       return { message: 'User registered successfully' };
     } catch (error) {
       throw new Error('An error occurred while registering the user');
     }
   }
 
-  async loginUser(username: string, password: string): Promise<string> {
+  async loginUser(email: string, password: string): Promise<string> {
     try {
-      const user = await this.userModel.findOne({ username });
+      const user = await this.userModel.findOne({ email });
       if (!user) {
         throw new NotFoundException('User not found');
       }
@@ -60,6 +59,21 @@ export class UserAuthService {
         `An error occurred while retrieving users: ${error.message}`,
       );
       throw new Error('An error occurred while retrieving users');
+    }
+  }
+
+  async getUser({ email, id }: { email?: string, id?: string }): Promise<User> {
+    try {
+      if (!email && !id) {
+        return null;
+      }
+      const user = email ? await this.userModel.findOne({ email }) : await this.userModel.findById(id);
+      return user;
+    } catch (error) {
+      this.logger.error(
+        `An error occurred while retrieving user: ${error.message}`,
+      );
+      throw new Error('An error occurred while retrieving user');
     }
   }
 }

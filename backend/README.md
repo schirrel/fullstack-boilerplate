@@ -71,3 +71,24 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
+
+npx nest g module user-profile   
+npx nest g service user-profile
+npx nest g controller user-profile
+
+
+
+https://www.google.com/search?q=mongodb+list+databases&oq=mongosh+list&gs_lcrp=EgZjaHJvbWUqCQgBEAAYChiABDIGCAAQRRg5MgkIARAAGAoYgAQyCQgCEAAYChiABDIJCAMQABgKGIAEMgkIBBAAGAoYgAQyCQgFEAAYChiABDIJCAYQABgKGIAEMgkIBxAAGAoYgAQyCQgIEAAYChiABDIJCAkQABgKGIAE0gEIMzE5N2owajeoAgCwAgA&sourceid=chrome&ie=UTF-8
+
+
+https://www.mongodb.com/docs/manual/reference/method/db.collection.findOne/
+https://www.mongodb.com/docs/mongodb-shell/
+
+
+sudo systemctl start mongod  
+
+https://stackoverflow.com/questions/76671274/update-a-mongodb-document-in-nestjs-typescript
+
+https://stackoverflow.com/questions/74114285/cant-find-and-update-record-from-mongodbnest-js
+https://madhums.me/2012/08/20/pagination-using-mongoose-express-and-jade/

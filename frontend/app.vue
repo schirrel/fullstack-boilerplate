@@ -2,16 +2,17 @@
 const router = useRouter()
 useHead({
   bodyAttrs: {
-    class: 'h-full bg-white'
+    class: 'h-full'
   }
 })
+onMounted(() =>{
+  document.querySelector('html').className = '';
+})
+
 </script>
 
 <template>
-  <!-- <NuxtExample dir="routing/pages" :nav="nav" current-route>
-    <NuxtLoadingIndicator /> -->
-  <main>
+  <NuxtLayout>
     <NuxtPage />
-  </main>
-  <!-- </NuxtExample> -->
+  </NuxtLayout>
 </template>
