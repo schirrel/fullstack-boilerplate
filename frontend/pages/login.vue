@@ -26,7 +26,7 @@
           </div>
           <div class="mt-2">
             <input id="password" v-model="credentials.password" name="password" type="password"
-              autocomplete="current-password" required=""
+              autocomplete="current-password" required
               class="block w-full bg-white rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
           </div>
         </div>
@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 
 
 import { storeToRefs } from 'pinia';
@@ -64,7 +64,6 @@ const router = useRouter();
 
 const login = async () => {
   await authenticateUser(credentials.value);
-  // redirect to homepage if user is authenticated
   if (authenticated) {
     router.push('/');
   }

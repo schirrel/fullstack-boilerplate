@@ -1,7 +1,6 @@
 import {
   Injectable,
   NotFoundException,
-  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,23 +8,27 @@ import { Model } from 'mongoose';
 import { User } from './schemas/user-auth.schema';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { Role } from './schemas/user-roles';
 
 @Injectable()
 export class UserAuthService {
-  private readonly logger = new Logger(UserAuthService.name);
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
   ) { }
 
-  async registerUser(
-    email: string,
-    password: string,
-  ): Promise<{ message: string }> {
+  async registerUser({ email, password, role }:
+    {
+      email: string,
+      password: string,
+      role: string
+    },
+  ): Promise<{ message: string, id: string }> {
     try {
       const hash = await bcrypt.hash(password, 10);
-      await this.userModel.create({ email, password: hash });
-      return { message: 'User registered successfully' };
+      const finalRole = role ?? Role.Customer;
+      const result = await this.userModel.create({ email, password: hash, role: finalRole });
+      return { message: 'User registered successfully', id: result._id.toString() };
     } catch (error) {
       throw new Error('An error occurred while registering the user');
     }
@@ -47,33 +50,6 @@ export class UserAuthService {
     } catch (error) {
       console.log(error);
       throw new UnauthorizedException('An error occurred while logging in');
-    }
-  }
-
-  async getUsers(): Promise<User[]> {
-    try {
-      const users = await this.userModel.find({});
-      return users;
-    } catch (error) {
-      this.logger.error(
-        `An error occurred while retrieving users: ${error.message}`,
-      );
-      throw new Error('An error occurred while retrieving users');
-    }
-  }
-
-  async getUser({ email, id }: { email?: string, id?: string }): Promise<User> {
-    try {
-      if (!email && !id) {
-        return null;
-      }
-      const user = email ? await this.userModel.findOne({ email }) : await this.userModel.findById(id);
-      return user;
-    } catch (error) {
-      this.logger.error(
-        `An error occurred while retrieving user: ${error.message}`,
-      );
-      throw new Error('An error occurred while retrieving user');
     }
   }
 }

@@ -8,7 +8,7 @@
                     <img class="h-8 w-auto" :src="LOGO" alt="">
                 </a>
             </div>
-            <div class="hidden lg:flex lg:gap-x-12">
+            <div class="flex lg:flex lg:gap-x-12">
                 <template v-for="menu in menus" :key="menu.title">
                     <div class="relative">
                         <NuxtLink class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900"
@@ -62,7 +62,7 @@
                     </div>
                 </template>
             </div>
-            <div class="hidden lg:flex lg:flex-1 lg:justify-end">
+            <div class="flex lg:flex lg:flex-1 lg:justify-end">
                 <a @click="logout" role="button" href="#" class="text-sm font-semibold leading-6 text-gray-900">Log
                     out<span aria-hidden="true">&rarr;</span></a>
             </div>

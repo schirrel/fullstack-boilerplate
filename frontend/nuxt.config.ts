@@ -15,5 +15,8 @@ export default defineNuxtConfig({
   },
   icon: {
     componentName: 'NuxtIcon'
-  }
+  },
+  imports: {
+    dirs: ['models/*.ts', 'models/**/*.ts'],
+  },
 })

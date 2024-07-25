@@ -1,6 +1,7 @@
 
 import { defineStore } from 'pinia';
 import { ENDPOINTS } from '~/services/api';
+import type { FetchError } from 'ofetch';
 
 interface UserPayloadInterface {
   email: string;
@@ -15,20 +16,32 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async authenticateUser({ email, password }: UserPayloadInterface) {
       // useFetch from nuxt 3
-      const { data, pending }: any = await useFetch(ENDPOINTS.login, {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: {
-          email,
-          password,
-        },
-      });
-      this.loading = pending;
+      this.loading = true;
+      try {
+        const response: { token: string } = await $fetch(ENDPOINTS.API_URL + ENDPOINTS.auth.login, {
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' },
+          body: {
+            email,
+            password,
+          },
+        });
+        console.log(response);
 
-      if (data.value) {
-        const token = useCookie('token'); // useCookie new hook in nuxt 3
-        token.value = data?.value?.token; // set token to cookie
-        this.authenticated = true; // set authenticated  state value to true
+        if (response.token) {
+          const token = useCookie('token'); // useCookie new hook in nuxt 3
+          token.value = response.token; // set token to cookie
+          this.authenticated = true; // set authenticated  state value to true
+        }
+      } catch (error) {
+        if ((error as FetchError).statusCode === 401) {
+          alert('Check your credentials');
+        } else {
+          alert('Sorry!\n Something went wrong when trying to log you in.');
+        }
+
+      } finally {
+        this.loading = false;
       }
     },
     logUserOut() {

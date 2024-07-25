@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { UserProfileService } from './user-profile.service';
 import { AuthGuard } from 'src/user-auth/auth.guard';
-import { UserProfile } from './schemas/user-auth.schema';
+import { UserProfile } from './schemas/user-profile.schema';
+import { UserProfileView } from './schemas/user-profile-view.schema';
 
 @Controller('api/profile')
 export class UserProfileController {
@@ -9,7 +10,7 @@ export class UserProfileController {
 
     @Get('list')
     @UseGuards(AuthGuard)
-    async getProfiles(): Promise<UserProfile[]> {
+    async getProfiles(): Promise<UserProfileView[]> {
         return this.service.getProfiles();
     }
 
@@ -23,17 +24,14 @@ export class UserProfileController {
     @Post(':userAuth')
     @UseGuards(AuthGuard)
     async createProfile(@Param('userAuth') userAuth: string, @Body() body: {
-        firstName,
-        lastName,
+        name,
         mobileNumber
     }): Promise<{ message: string }> {
-        const { firstName,
-            lastName,
+        const { name,
             mobileNumber } = body;
         return this.service.createProfile({
             userAuth,
-            firstName,
-            lastName,
+            name,
             mobileNumber
 
         })

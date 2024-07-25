@@ -81,7 +81,7 @@ npx nest g controller user-profile
 
 https://www.google.com/search?q=mongodb+list+databases&oq=mongosh+list&gs_lcrp=EgZjaHJvbWUqCQgBEAAYChiABDIGCAAQRRg5MgkIARAAGAoYgAQyCQgCEAAYChiABDIJCAMQABgKGIAEMgkIBBAAGAoYgAQyCQgFEAAYChiABDIJCAYQABgKGIAEMgkIBxAAGAoYgAQyCQgIEAAYChiABDIJCAkQABgKGIAE0gEIMzE5N2owajeoAgCwAgA&sourceid=chrome&ie=UTF-8
 
-
+listCollections
 https://www.mongodb.com/docs/manual/reference/method/db.collection.findOne/
 https://www.mongodb.com/docs/mongodb-shell/
 
@@ -92,3 +92,8 @@ https://stackoverflow.com/questions/76671274/update-a-mongodb-document-in-nestjs
 
 https://stackoverflow.com/questions/74114285/cant-find-and-update-record-from-mongodbnest-js
 https://madhums.me/2012/08/20/pagination-using-mongoose-express-and-jade/
+
+mongosh
+- db.getCollectionNames
+- db.listDatabases
+https://medium.com/@gawade.jitu02/how-to-use-mongodb-views-in-nestjs-2d16a85f151c

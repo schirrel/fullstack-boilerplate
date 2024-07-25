@@ -6,9 +6,7 @@ export class UserProfile {
   @Prop()
   userAuth: string;
   @Prop()
-  firstName: string;
-  @Prop()
-  lastName: string;
+  name: string;
   @Prop()
   mobileNumber: string;
 }

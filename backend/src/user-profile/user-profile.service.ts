@@ -1,9 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { UserProfile } from './schemas/user-auth.schema';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { UserProfile } from './schemas/user-profile.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UserAuthService } from 'src/user-auth/user-auth.service';
-import { User } from 'src/user-auth/schemas/user-auth.schema';
+import { UserProfileView } from './schemas/user-profile-view.schema';
 
 @Injectable()
 export class UserProfileService {
@@ -11,27 +10,25 @@ export class UserProfileService {
 
   constructor(
     @InjectModel(UserProfile.name) private userProfileModel: Model<UserProfile>,
-    private readonly userAuthService: UserAuthService
+    @InjectModel('UserProfileView') private readonly userProfileView: Model<UserProfileView>
   ) { }
 
   async createProfile({
     userAuth,
-    firstName,
-    lastName,
+    name,
     mobileNumber
   }: {
     userAuth: string,
-    firstName: string,
-    lastName: string,
+    name: string,
     mobileNumber: string
   }): Promise<{ message: string }> {
     try {
-      await this.userProfileModel.create({
+      const result = await this.userProfileModel.create({
         userAuth,
-        firstName,
-        lastName,
+        name,
         mobileNumber
       });
+      console.log(result);
       return { message: 'Profile successfully created.' };
     } catch (error) {
       throw new Error('An error occurred while registering the user');
@@ -52,25 +49,25 @@ export class UserProfileService {
       throw new Error('An error occurred while retrieving user');
     }
   }
-  async getUserProfile({ email, id }): Promise<{ profile: UserProfile, user: User }> {
-    try {
-      if (!email && !id) {
-        return null;
-      }
-      const profile = email ? await this.userProfileModel.findOne({ email }) : await this.userProfileModel.findById(id);
-      const user = await this.userAuthService.getUser({ id: profile.userAuth });
-      return { profile, user };
-    } catch (error) {
-      this.logger.error(
-        `An error occurred while retrieving user: ${error.message}`,
-      );
-      throw new Error('An error occurred while retrieving user');
-    }
-  }
+  // async getUserProfile({ email, id }): Promise<{ profile: UserProfile, user: User }> {
+  //   try {
+  //     if (!email && !id) {
+  //       return null;
+  //     }
+  //     const profile = email ? await this.userProfileModel.findOne({ email }) : await this.userProfileModel.findById(id);
+  //     const user = await this.userAuthService.getUser({ id: profile.userAuth });
+  //     return { profile, user };
+  //   } catch (error) {
+  //     this.logger.error(
+  //       `An error occurred while retrieving user: ${error.message}`,
+  //     );
+  //     throw new Error('An error occurred while retrieving user');
+  //   }
+  // }
 
-  async getProfiles(): Promise<UserProfile[]> {
+  async getProfiles(): Promise<UserProfileView[]> {
     try {
-      const profiles = await this.userProfileModel.find({});
+      const profiles = await this.userProfileView.find({}).exec();
       return profiles;
     } catch (error) {
       this.logger.error(

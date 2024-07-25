@@ -1,0 +1,41 @@
+db.dropUser("dbAdminUser")
+mongodb://dbAdminUser:dbAdminPwd@127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&authSource=dbProject&appName=mongosh+2.2.12
+db.createUser( { user: "dbAdminUser",
+                 pwd:  "dbAdminPwd",  // Or  "<cleartext password>",
+                  roles:
+                    [
+                        "readWrite",
+                        "dbAdmin"
+                    ]
+               } )
+
+use dbProject
+
+ db.createCollection('users');
+ db.createCollection('userprofiles');
+
+db.createCollection("users")
+db.users.insertOne({email: "alan@schirrel.dev"})
+
+db.getCollection( "userprofiles")
+db.createView( "listprofiles", "userprofiles", [
+   {
+      $lookup:
+         {
+            from: "users",
+            localField: "_id",
+            foreignField: "userAuth",
+            as: "profile"
+         }
+   },
+   {
+      $project:
+         {
+           email: 1,
+           role: 1,
+           name:  "$profile.name",
+           mobileNumber:  "$profile.mobileNumber",
+         }
+   },
+      { $unwind: "$profile" }
+] )
