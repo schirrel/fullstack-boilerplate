@@ -4,13 +4,13 @@ import { UserProfileController } from './user-profile.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserProfileSchema } from './schemas/user-profile.schema';
 import { JwtService } from "@nestjs/jwt";
-import { UserProfileViewSchema } from './schemas/user-profile-view.schema';
+import { UserProfileViewSchema } from './schemas/view-profile.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: 'UserProfile', schema: UserProfileSchema },
-      { name: 'UserProfileView', schema: UserProfileViewSchema, collection: 'listprofiles' }, // Specify the collection name
+      { name: 'ViewProfile', schema: UserProfileViewSchema, collection: 'viewprofiles' }, // Specify the collection name
 
     ])
   ],

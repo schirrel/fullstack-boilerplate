@@ -39,14 +39,14 @@
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                 placeholder="Sherek the third" required>
                         </div>
-                        <div><label for="role"
+                        <div>
+                            <label for="role"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Role</label>
                             <select id="role" required v-model="newUser.role"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                                 <option selected>Select role</option>
-                                <option value="admin">Administrator</option>
-                                <option value="customer">Customer</option>
-                                <option value="editor">Editor</option>
+                                <option v-for="role in roles" :key="role.value" :value="role.value">{{ role.label }}
+                                </option>
                             </select>
                         </div>
                         <div>
@@ -61,7 +61,7 @@
 
                     <button type="submit" :disable="loading"
                         class="text-white inline-flex items-center bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                        <Icon name="ic:round-plus" size="18" />
+                        <NuxtIcon name="ic:round-plus" size="18" />
                         Add User
                     </button>
                 </form>
@@ -73,8 +73,13 @@
 <script lang="ts" setup>
 import { ENDPOINTS } from '~/services/api';
 
+import { storeToRefs } from 'pinia';
+import { useAuthStore } from '~/store/auth';
+
 const { $api } = useNuxtApp()
 const router = useRouter();
+const { user } = storeToRefs(useAuthStore()); // make authenticated state reactive
+
 
 const newUser = ref({
     email: null,
@@ -85,6 +90,25 @@ const newUser = ref({
 });
 const loading = ref(false);
 const loadingText = ref('');
+const allRoles = [
+    { value: "admin", label: "Administrator" },
+    { value: "editor", label: "Editor" },
+    { value: "customer", label: "Customer" },
+];
+
+const roles = ref([]);
+
+
+// functions
+const rolesAllowedForUser = () => {
+    if (!user.value) return [];
+
+    const userRoleIndex = allRoles?.findIndex((role) => {
+        return role.value === user.value?.role;
+    })
+    return allRoles?.splice(userRoleIndex);
+}
+
 
 const createUser = () => {
     console.log(newUser.value);
@@ -139,4 +163,21 @@ const saveProfile = async (id: string) => {
         loading.value = false;
     };
 }
+
+// setup/asyncData
+if (user.value) {
+    roles.value = rolesAllowedForUser() as any;
+} else {
+    const userWatch = watch(() => {
+        return user.value
+    }, () => {
+        if (user?.value?.role) {
+            roles.value = rolesAllowedForUser() as any;
+            userWatch && userWatch();
+        }
+
+    }, { deep: true, immediate: true })
+}
+
+
 </script>

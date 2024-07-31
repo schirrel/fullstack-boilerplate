@@ -73,3 +73,11 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+
+## Icons
+https://icones.js.org/collection/ic
+
+
+## UI
+https://flowbite.com/docs/getting-started/introduction/

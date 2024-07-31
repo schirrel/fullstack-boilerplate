@@ -13,12 +13,12 @@
                     <div class="relative">
                         <NuxtLink class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900"
                             v-if="menu.route" :to="menu.route">
-                            <Icon v-if="menu.icon" :name="menu.icon" /> {{ menu.title }}
+                            <NuxtIcon v-if="menu.icon" :name="menu.icon" /> {{ menu.title }}
                         </NuxtLink>
                         <button v-else type="button"
                             class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900"
                             aria-expanded="false" @click="menu.open = !menu.open">
-                            <Icon v-if="menu.icon" :name="menu.icon" /> {{ menu.title }}
+                            <NuxtIcon v-if="menu.icon" :name="menu.icon" /> {{ menu.title }}
 
                             <svg class="h-5 w-5 flex-none text-gray-400" viewBox="0 0 20 20" fill="currentColor"
                                 aria-hidden="true">
@@ -27,14 +27,9 @@
                                     clip-rule="evenodd" />
                             </svg>
                         </button>
-                        <Transition 
-                            enter-active-class="duration-300 ease-out"
-                            enter-from-class="transform opacity-0 "
-                            enter-to-class="opacity-100"
-                            leave-active-class="duration-200 ease-in"
-                            leave-from-class="opacity-100"
-                            leave-to-class="transform opacity-0"
-                            >
+                        <Transition enter-active-class="duration-300 ease-out" enter-from-class="transform opacity-0 "
+                            enter-to-class="opacity-100" leave-active-class="duration-200 ease-in"
+                            leave-from-class="opacity-100" leave-to-class="transform opacity-0">
                             <div v-if="menu.open"
                                 class="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5">
                                 <div class="p-4">
@@ -43,7 +38,7 @@
                                             class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50">
                                             <div
                                                 class="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                                                <Icon v-if="item.icon" size="28px" :name="item.icon" />
+                                                <NuxtIcon v-if="item.icon" size="28px" :name="item.icon" />
 
                                             </div>
                                             <div class="flex-auto">
@@ -51,7 +46,7 @@
                                                     :to="item.route"> {{ item.title }}
                                                 </NuxtLink>
                                                 <p class="mt-1 text-gray-600" v-if="item.description"> {{
-                        item.description
+                                                    item.description
                                                     }}</p>
                                             </div>
                                         </div>
@@ -79,14 +74,23 @@ import { LOGO } from '~/utils/constants';
 const router = useRouter();
 
 const { logUserOut } = useAuthStore();
-const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive
+const { user } = storeToRefs(useAuthStore()); // make authenticated state reactive
+
+type IMenu = {
+    title: string,
+    route?: string,
+    icon: string
+    description?: string,
+    permissions?: string[]
+    submenus?: IMenu[]
+}
 
 const logout = () => {
     logUserOut();
     router.push('/login');
 };
 
-const menus = ref([{
+const allMenus = ref<IMenu[]>([{
     title: 'Reports',
     route: '/reports',
     icon: 'ic:baseline-newspaper',
@@ -99,6 +103,7 @@ const menus = ref([{
 }, {
     title: 'Settings',
     icon: 'ic:baseline-settings',
+    permissions: ['admin', 'editor'],
     submenus: [
         {
             title: 'Users',
@@ -110,7 +115,27 @@ const menus = ref([{
             route: '/configuration',
             description: 'Setup system values definitions',
             icon: 'ic:outline-view-agenda',
+            permissions: ['admin']
 
         }]
-}])
+}]);
+
+const hasPermission = (userRole: string, menu: IMenu) => {
+    return !menu.permissions || menu.permissions?.includes(userRole);
+}
+
+const checkMenu = (menu: IMenu) => {
+    const has = hasPermission(user.value.role, menu);
+    if (menu.submenus?.length) {
+        menu.submenus = menu.submenus.filter(checkMenu);
+    }
+    return has;
+}
+
+const menus = computed(() => {
+    if (!user.value) return [];
+    return allMenus?.value.filter(checkMenu);
+})
+
+
 </script>

@@ -18,24 +18,26 @@ db.createCollection("users")
 db.users.insertOne({email: "alan@schirrel.dev"})
 
 db.getCollection( "userprofiles")
-db.createView( "listprofiles", "userprofiles", [
-   {
-      $lookup:
-         {
-            from: "users",
-            localField: "_id",
-            foreignField: "userAuth",
-            as: "profile"
-         }
-   },
-   {
-      $project:
-         {
+db.createView("viewprofiles", "users", [
+    {
+        $lookup: {
+            from: "userprofiles", localField: "_id", foreignField: "userId", as: "lookup"
+        }
+    },
+    {
+        $unwind: {
+            path: "$lookup"
+        }
+    },
+    {
+        $project:{
+           _id: 1,
            email: 1,
            role: 1,
-           name:  "$profile.name",
-           mobileNumber:  "$profile.mobileNumber",
-         }
-   },
-      { $unwind: "$profile" }
-] )
+           name:  "$lookup.name",
+           mobileNumber:  "$lookup.mobileNumber",
+           _pId:  "$lookup._id",
+           _uId:  "$lookup.userId"
+        }
+    }
+])

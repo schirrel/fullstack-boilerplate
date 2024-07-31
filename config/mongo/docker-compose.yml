@@ -1,0 +1,37 @@
+services:
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    env_file:
+      - .env
+    links:
+      - mongo-db
+    networks:
+      - mongo-compose-network
+    restart: always
+    depends_on:
+      - mongo-db
+
+  mongo-db:
+    image: mongo:latest
+    container_name: mongo
+    env_file:
+      - .dockernev
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data_container:/data/db
+    networks:
+      - mongo-compose-network
+    restart: always
+    command:
+      - '--bind_ip_all'
+
+
+networks:
+    mongo-compose-network:
+      driver: bridge
+
+volumes:
+  mongodb_data_container:

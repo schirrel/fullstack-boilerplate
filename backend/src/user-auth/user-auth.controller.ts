@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
 import { UserAuthService } from './user-auth.service';
 import { User } from './schemas/user-auth.schema';
 import { AuthGuard } from './auth.guard';
@@ -20,5 +20,4 @@ export class UserAuthController {
     const token = await this.userAuthService.loginUser(email, password);
     return { message: 'Login successful', token };
   }
-
 }

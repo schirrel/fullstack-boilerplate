@@ -4,7 +4,9 @@ import { Role } from './user-roles';
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop()
+  @Prop({
+    unique: true
+  })
   email: string;
   @Prop()
   password: string;

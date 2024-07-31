@@ -10,7 +10,10 @@ export default defineNuxtConfig({
     preference: "light",
   },
   tailwindcss: {
-    viewer: false
+    viewer: true,
+    plugins: [
+      require('flowbite/plugin')
+    ],
     // viewer: { endpoint: '/_tailwind', exportViewer: true }
   },
   icon: {

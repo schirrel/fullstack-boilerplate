@@ -3,7 +3,7 @@ import { Document, model } from 'mongoose';
 import { Role } from 'src/user-auth/schemas/user-roles';
 
 @Schema({ timestamps: true })
-export class UserProfileView {
+export class ViewProfile {
   @Prop()
   email: string;
   @Prop()
@@ -14,8 +14,8 @@ export class UserProfileView {
   mobileNumber: string;
 }
 
-export type UserProfileViewDocument = UserProfileView & Document;
-export const UserProfileViewSchema = SchemaFactory.createForClass(UserProfileView)
+export type UserProfileViewDocument = ViewProfile & Document;
+export const UserProfileViewSchema = SchemaFactory.createForClass(ViewProfile)
 
 
-export const MyViewModel = model<UserProfileView>('UserProfileView', UserProfileViewSchema, 'listprofiles');
+export const MyViewModel = model<ViewProfile>('UserProfileView', UserProfileViewSchema, 'listprofiles');

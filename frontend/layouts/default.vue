@@ -114,4 +114,22 @@
 </template>
 <script lang="ts" setup>
 import { LOGO } from '~/utils/constants';
+
+import { storeToRefs } from 'pinia';
+import { useAuthStore } from '~/store/auth';
+import { useFlowbite } from '~/composables/useFlowbite';
+
+const { loadUser } = useAuthStore(); // use auth store
+const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive
+
+onMounted(() => {
+
+    useFlowbite(() => {
+        initFlowbite();
+    })
+
+ if (authenticated) {
+    loadUser();
+  }
+})
 </script>

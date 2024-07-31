@@ -7,6 +7,10 @@ export const ENDPOINTS = {
     },
     profile: {
         list: `/profile/list`,
-        create: `/profile`
-    }
+        api: `/profile`,
+        user: `/profile/user`,
+        create: `/profile`,
+        me: `/profile`,
+    },
+    user: '/user'
 }

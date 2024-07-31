@@ -16,55 +16,34 @@
                 <tr class="border-b dark:border-gray-700">
                     <template v-for="column in columns" :key="column.title">
                         <td class="px-4 py-3"> {{ getFieldValue(item, column) }}</td>
+
                     </template>
+                    <td v-if="actions.length">
+
+
+
+                        <div class="inline-flex rounded-md shadow-sm" role="group">
+                            <button type="button" v-for="(action, index) in actions" :key="action.type"
+                                @click="actionClick({ action, item })"
+                                class="px-4 py-2 text-sm font-medium text-gray-900 border border-gray-200 hover:bg-gray-100"
+                                :class="[action.color, { 'rounded-s-lg': index === 0 }, { 'rounded-e-lg': index === actions.length - 1 }]">
+                                <NuxtIcon v-if="action.icon" :name="action.icon" /> {{ action.title }}
+                            </button>
+                        </div>
+
+
+                    </td>
                 </tr>
             </template>
-            <tr class="border-b dark:border-gray-700">
-                <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Apple iMac 27&#34;</th>
-                <td class="px-4 py-3">PC</td>
-                <td class="px-4 py-3">Apple</td>
-                <td class="px-4 py-3">300</td>
-                <td class="px-4 py-3">$2999</td>
-                <td class="px-4 py-3 flex items-center justify-end">
-                    <button id="apple-imac-27-dropdown-button" data-dropdown-toggle="apple-imac-27-dropdown"
-                        class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
-                        type="button">
-                        <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                        </svg>
-                    </button>
-                    <div id="apple-imac-27-dropdown"
-                        class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
-                        <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
-                            aria-labelledby="apple-imac-27-dropdown-button">
-                            <li>
-                                <a href="#"
-                                    class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Show</a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                    class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edit</a>
-                            </li>
-                        </ul>
-                        <div class="py-1">
-                            <a href="#"
-                                class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Delete</a>
-                        </div>
-                    </div>
-                </td>
-            </tr>
         </tbody>
-        <tfoot>
-            loading? {{ loading }}
-        </tfoot>
     </table>
 </template>
 
 <script setup lang="ts">
+import type { Action } from '~/models/components/data-table';
 
+
+const emits = defineEmits(['actionClick']);
 const props = defineProps({
     columns: {
         required: true,
@@ -73,26 +52,42 @@ const props = defineProps({
     data: {},
     loading: Boolean,
     actions: {
-        type: Array,
+        type: Object as PropType<Action[]>,
         default: () => []
-    }
+    },
+    crudActions: Boolean
 });
+
+const crudActions = [{
+    title: 'Edit',
+    icon: 'ic:baseline-edit',
+    type: 'edit',
+    color: 'bg-green-700 hover:bg-green-800 focus:ring-4 text-white',
+    permission: ['editor', 'admin']
+},
+{
+    title: 'Delete',
+    icon: 'ic:baseline-delete',
+    type: 'delete',
+    color: 'bg-red-700 hover:bg-red-800 focus:ring-4 text-white',
+    permission: ['admin']
+}]
 
 const columns = computed(() => {
     return props.columns;
 });
 const actions = computed(() => {
-    return props.actions;
+    return props.crudActions ? crudActions : props.actions;
 });
 const data = computed(() => {
     return props.data;
 });
 
 const getFieldValue = (item: any, column: Column) => {
-    if(!column.field) {
+    if (!column.field) {
         return '';
     }
     return item[column.field];
-
 }
+const actionClick = (data: { action: Action, item: any }) => emits('actionClick', data);
 </script>

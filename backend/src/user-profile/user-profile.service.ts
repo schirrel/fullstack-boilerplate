@@ -1,8 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { UserProfile } from './schemas/user-profile.schema';
+import { UserProfile, UserProfileDTO } from './schemas/user-profile.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UserProfileView } from './schemas/user-profile-view.schema';
+import { ViewProfile } from './schemas/view-profile.schema';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class UserProfileService {
@@ -10,23 +11,24 @@ export class UserProfileService {
 
   constructor(
     @InjectModel(UserProfile.name) private userProfileModel: Model<UserProfile>,
-    @InjectModel('UserProfileView') private readonly userProfileView: Model<UserProfileView>
-  ) { }
+    @InjectModel('ViewProfile')
+    private readonly profileView: Model<ViewProfile>,
+  ) {}
 
   async createProfile({
-    userAuth,
+    userId,
     name,
-    mobileNumber
+    mobileNumber,
   }: {
-    userAuth: string,
-    name: string,
-    mobileNumber: string
+    userId: string;
+    name: string;
+    mobileNumber: string;
   }): Promise<{ message: string }> {
     try {
       const result = await this.userProfileModel.create({
-        userAuth,
+        userId: new ObjectId(userId),
         name,
-        mobileNumber
+        mobileNumber,
       });
       console.log(result);
       return { message: 'Profile successfully created.' };
@@ -35,12 +37,20 @@ export class UserProfileService {
     }
   }
 
-  async getProfile({ email, id }: { email?: string, id?: string }): Promise<UserProfile> {
+  async getProfile({
+    email,
+    id,
+  }: {
+    email?: string;
+    id?: string;
+  }): Promise<UserProfile> {
     try {
       if (!email && !id) {
         return null;
       }
-      const profile = email ? await this.userProfileModel.findOne({ email }) : await this.userProfileModel.findById(id);
+      const profile = email
+        ? await this.userProfileModel.findOne({ email })
+        : await this.userProfileModel.findById(id);
       return profile;
     } catch (error) {
       this.logger.error(
@@ -49,25 +59,24 @@ export class UserProfileService {
       throw new Error('An error occurred while retrieving user');
     }
   }
-  // async getUserProfile({ email, id }): Promise<{ profile: UserProfile, user: User }> {
-  //   try {
-  //     if (!email && !id) {
-  //       return null;
-  //     }
-  //     const profile = email ? await this.userProfileModel.findOne({ email }) : await this.userProfileModel.findById(id);
-  //     const user = await this.userAuthService.getUser({ id: profile.userAuth });
-  //     return { profile, user };
-  //   } catch (error) {
-  //     this.logger.error(
-  //       `An error occurred while retrieving user: ${error.message}`,
-  //     );
-  //     throw new Error('An error occurred while retrieving user');
-  //   }
-  // }
-
-  async getProfiles(): Promise<UserProfileView[]> {
+  async getUserProfile(id: string): Promise<ViewProfile> {
     try {
-      const profiles = await this.userProfileView.find({}).exec();
+      if (!id) {
+        return null;
+      }
+      const profile = await this.profileView.findById(id);
+      return profile;
+    } catch (error) {
+      this.logger.error(
+        `An error occurred while retrieving user: ${error.message}`,
+      );
+      throw new Error('An error occurred while retrieving user');
+    }
+  }
+
+  async getProfiles(): Promise<ViewProfile[]> {
+    try {
+      const profiles = await this.profileView.find({}).exec();
       return profiles;
     } catch (error) {
       this.logger.error(
@@ -75,5 +84,23 @@ export class UserProfileService {
       );
       throw new Error('An error occurred while retrieving profiles');
     }
+  }
+  async getProfileBy(search: any): Promise<UserProfile> {
+    try {
+      const profiles = await this.userProfileModel.findOne(search).exec();
+      return profiles;
+    } catch (error) {
+      this.logger.error(
+        `An error occurred while retrieving profiles: ${error.message}`,
+      );
+      throw new Error('An error occurred while retrieving profiles');
+    }
+  }
+
+  async updateProfile(id: string, profile: UserProfileDTO) {
+    return this.userProfileModel.findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      profile,
+    );
   }
 }
