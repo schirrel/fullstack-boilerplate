@@ -74,6 +74,7 @@
     </section>
 </template>
 
+
 <script lang="ts" setup>
 import { ENDPOINTS } from '~/services/api';
 
@@ -84,6 +85,7 @@ import { useAuthStore } from '~/store/auth';
 
 const { user } = storeToRefs(useAuthStore()); // make authenticated state reactive
 
+const { $api } = useNuxtApp()
 
 const editUser = ref({
     email: null,
@@ -108,7 +110,6 @@ const allRoles = [
 
 const roles = ref([]);
 
-
 // computed
 
 const allowedToEditRole = computed(() => {
@@ -118,7 +119,6 @@ const allowedToEditRole = computed(() => {
 const enableUpdate = computed(() => {
     return JSON.stringify(backUser.value) !== JSON.stringify(editUser.value);
 })
-
 
 // functions
 const rolesAllowedForUser = () => {
@@ -130,16 +130,13 @@ const rolesAllowedForUser = () => {
     return allRoles?.splice(userRoleIndex);
 }
 
-
-
 const updateUser = async () => {
     loading.value = true;
     loadingText.value = 'Updating profile...';
     try {
-
-        const response = await useApi(`${ENDPOINTS.profile}/${route.params.id}`, {
+        const response = await $api(`${ENDPOINTS.profile.api}/${route.params.id}`, {
             method: 'PUT',
-            data: editUser.value
+            body: editUser.value
         })
     } catch (error: any) {
         console.log(error);
@@ -149,9 +146,7 @@ const updateUser = async () => {
         loadingText.value = '';
         loading.value = false;
     };
-
 }
-
 
 // setup/asyncData
 if (user.value) {
@@ -164,14 +159,11 @@ if (user.value) {
             roles.value = rolesAllowedForUser() as any;
             userWatch && userWatch();
         }
-
     }, { deep: true, immediate: true })
 }
 
-
 const { data: credentials } = await useAPI(`${ENDPOINTS.user}/${route.params.id}`)
 const { data: profile } = await useAPI(`${ENDPOINTS.profile.user}/${route.params.id}`)
-
 
 editUser.value = {
     email: credentials?.value?.email,

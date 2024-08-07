@@ -34,7 +34,7 @@ export class UserProfileController {
   @UseGuards(AuthGuard)
   async updateProfile(
     @Param('id') id: string,
-    profile: UserProfileDTO,
+    @Body() profile: UserProfileDTO,
   ): Promise<UserProfile> {
     return this.service.updateProfile(id, profile);
   }

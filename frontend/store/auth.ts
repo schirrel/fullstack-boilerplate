@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ENDPOINTS } from "~/services/api";
 import type { FetchError } from "ofetch";
+import type { UserProfile } from "~/models/user-profile";
 
 interface UserPayloadInterface {
   email: string;
@@ -11,7 +12,7 @@ export const useAuthStore = defineStore("auth", {
   state: () => ({
     authenticated: false,
     loading: false,
-    user: null as unknown as User,
+    user: null as unknown as UserProfile,
   }),
   actions: {
     async authenticateUser({ email, password }: UserPayloadInterface) {
@@ -52,7 +53,7 @@ export const useAuthStore = defineStore("auth", {
     async loadUser() {
       const { $api } = useNuxtApp();
 
-      const user = (await $api(ENDPOINTS.profile.me)) as object;
+      const user = (await $api(ENDPOINTS.profile.me)) as UserProfile;
       this.user = user;
     },
   },

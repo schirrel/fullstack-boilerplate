@@ -99,7 +99,7 @@ export class UserProfileService {
 
   async updateProfile(id: string, profile: UserProfileDTO) {
     return this.userProfileModel.findOneAndUpdate(
-      { _id: new ObjectId(id) },
+      { userId: new ObjectId(id) },
       profile,
     );
   }
